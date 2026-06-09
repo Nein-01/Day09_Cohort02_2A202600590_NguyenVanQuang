@@ -18,9 +18,9 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from common.llm import get_llm
-
-QUESTION = "What are the legal consequences if a company breaches a non-disclosure agreement?"
-
+# What are the legal consequences if a company breaches a non-disclosure agreement?
+QUESTION = "Trộm cướp ở Việt Nam có bị phạt tù không? Nếu có, mức phạt là bao nhiêu?"
+# Trộm cướp ở Việt Nam có bị phạt tù không? Nếu có, mức phạt là bao nhiêu?
 
 async def main():
     print("=" * 70)

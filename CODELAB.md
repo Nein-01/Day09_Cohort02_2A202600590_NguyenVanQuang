@@ -65,9 +65,11 @@ uv run python stages/stage_1_direct_llm/main.py
 Mở file `stages/stage_1_direct_llm/main.py` và trả lời:
 
 1. LLM được khởi tạo như thế nào? (Tìm hàm `get_llm()`)
+    -> LLM được khởi tạo trực tiếp vào biến "llm" bằng hàm khởi tạo "get_llm()" đã được implement ở "common/llm.py"
 2. Message được gửi đến LLM có cấu trúc gì?
+    -> Message gửi cho LLM là một mảng 2 phần tử [SystemMessage, HumanMessage].
 3. Tại sao cần có `SystemMessage` và `HumanMessage`?
-
+    -> Để phân rõ vai trò cho LLM xác định đúng phạm vi domain mà HumanMessage nhắm tới.
 **Bài Tập 1.1:** Thay đổi câu hỏi
 
 Sửa biến `QUESTION` thành câu hỏi pháp lý khác (tiếng Việt hoặc tiếng Anh) và chạy lại.
@@ -105,8 +107,11 @@ uv run python stages/stage_2_rag_tools/main.py
 Mở `stages/stage_2_rag_tools/main.py` và tìm:
 
 1. Hàm `@tool` decorator được dùng ở đâu?
+    -> `@tool` decorator được đặt trước khai báo hàm `search_legal_database` và `calculate_damages`.
 2. `LEGAL_KNOWLEDGE` được cấu trúc như thế nào?
+    -> Là một cấu trúc JSON gồm 3 trường {id, keywords, text}.
 3. LLM được bind với tools ra sao? (Tìm `.bind_tools()`)
+    -> LLM sau khi được khởi tạo thì tiếp tục được extend đến hàm `.bind_tools()` của langgraph với mảng TOOLS là tên các tools đã được định nghĩa.
 
 **Bài Tập 2.1:** Thêm knowledge base entry
 
@@ -383,9 +388,34 @@ Sửa `tax_agent/graph.py`, thay đổi system prompt để agent trả lời ng
 ### Câu Hỏi Ôn Tập
 
 1. Khi nào nên dùng single agent thay vì multi-agent?
+    -> Nên dùng single agent khi bài toán còn nhỏ, luồng xử lý rõ ràng, ít domain chuyên môn và không cần nhiều agent phối hợp độc lập. 
 2. Ưu điểm của A2A protocol so với gRPC hoặc REST thông thường?
+    -> REST/gRPC phù hợp khi bạn biết chính xác API cần gọi.
+    A2A phù hợp khi bạn muốn nói: “Agent nào có năng lực giải task này thì hãy xử lý giúp tôi.”
 3. Làm thế nào để prevent infinite delegation loops trong A2A?
+    -> Để tránh infinite delegation loops:
+        - Dùng delegation depth limit.
+        - Gắn trace ID và visited agents.
+        - Phân quyền rõ agent nào được delegate cho ai.
+        - Dùng timeout và budget.
+        - Lập orchestrator hoặc policy layer
 4. Tại sao cần Registry service? Có thể hardcode URLs không?
+    -> Registry service cần thiết vì nó giúp hệ thống biết:
+        - Agent nào đang tồn tại.
+        - Agent đó có capability gì.
+        - Endpoint hiện tại là gì.
+        - Version nào đang chạy.
+        - Agent có đang healthy không.
+        - Agent yêu cầu auth/scope nào.
+        - Agent có hỗ trợ streaming, file, audio, image hay không.
+        - Agent nào phù hợp nhất cho một task cụ thể.
+    Hardcode URL chỉ ổn khi:
+        - Chỉ có 1–3 service.
+        - Môi trường cố định.
+        - Không cần scale.
+        - Không cần versioning.
+        - Không có agent bên thứ ba.
+        - Chưa cần dynamic routing.
 
 ### Bài Tập Nâng Cao (Tự Học)
 
@@ -427,6 +457,7 @@ Nếu gặp vấn đề:
 ## **Bài Tập Cộng Điểm:**
 Sau khi chạy full Stage 5 (test_client.py) trả lời 2 câu hỏi:
 - Latency (Tổng thời gian trả lời 1 câu hỏi của hệ thống) là bao nhiêu giây?
+    -> Hệ thống agent đã khởi động, nhưng khi chạy test_client.py thì bị lỗi Client Request timed out, vẫn chưa thể khắc phục.
 - Đề xuất phương án giảm latency và demo + show thời gian xử lý đã giảm được khi apply phương án?
 
 **Chúc các bạn học tốt! 🚀**
